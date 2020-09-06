@@ -39,29 +39,20 @@ app.post("/api/notes", async (req,res)=>{
 })
 
 //route to read the db.json file 
-app.delete("/api/notes/:id", function(req,res){
-    var id = req.params.id;
-    console.log(id)
-    fs.readFile(path.join(__dirname, "db/db.json"), "utf8", (err, data) =>{
-        let notes = JSON.parse(data)
- 
-        for (const note of notes){
-            if (note.id == id){
-                let index = notes.indexOf(note)
-               notes.splice(index, 1)
-               fs.writeFile(
-                 path.join(__dirname, "db/db.json"),
-                 JSON.stringify(notes), "utf8", (err)=> {
-                     if (err) throw err
-                     console.log("Note Deleted")
-                 }
-               )
-               return res.send(true)
-            }
-        }
-        return res.json(false)
-     })
-})
+app.delete("/api/notes/:id", async (req, res) => {
+    const deleteId = req.params.id;
+    console.log(deleteId);
+    try {
+      if (deleteId) {
+        db = db.filter(function (val) {
+          return val.id != deleteId;
+        });
+      }
+      return res.json(db);
+    } catch {
+      res.status(500).json(err);
+    }
+  });
 
 //route to return the index.html file
 app.get("/", function(req,res){
